@@ -1,0 +1,1040 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Use Claude Code Desktop – Claude Docs</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #ffffff;
+      --sidebar-bg: #f9f9f8;
+      --sidebar-border: #e5e5e3;
+      --text: #1a1a18;
+      --text-muted: #6b6b6b;
+      --accent: #d97706;
+      --accent-hover: #b45309;
+      --link: #0f6cbd;
+      --link-hover: #0d5499;
+      --border: #e5e5e3;
+      --code-bg: #f4f4f2;
+      --code-border: #e0e0dc;
+      --note-bg: #fffbeb;
+      --note-border: #fbbf24;
+      --tip-bg: #f0fdf4;
+      --tip-border: #22c55e;
+      --sidebar-active: #fff7ed;
+      --sidebar-active-text: #92400e;
+      --table-header: #f4f4f2;
+      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Inter", Helvetica, Arial, sans-serif;
+      --font-mono: "JetBrains Mono", "Fira Code", "Cascadia Code", Consolas, "Courier New", monospace;
+    }
+
+    html { font-size: 16px; scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font-sans);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.65;
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* ── Sidebar ──────────────────────────────── */
+    .sidebar {
+      width: 272px;
+      min-width: 272px;
+      background: var(--sidebar-bg);
+      border-right: 1px solid var(--sidebar-border);
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+      padding: 0 0 32px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .sidebar-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 20px 20px 16px;
+      border-bottom: 1px solid var(--sidebar-border);
+      text-decoration: none;
+      color: var(--text);
+    }
+
+    .sidebar-logo svg { flex-shrink: 0; }
+
+    .sidebar-logo-text {
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+    }
+
+    .sidebar-logo-sub {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 1px;
+    }
+
+    .sidebar-section-label {
+      font-size: 10.5px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      padding: 20px 20px 6px;
+    }
+
+    .sidebar-nav { list-style: none; padding: 0 8px; }
+
+    .sidebar-nav li { margin: 1px 0; }
+
+    .sidebar-nav a {
+      display: block;
+      padding: 6px 12px;
+      border-radius: 6px;
+      text-decoration: none;
+      color: var(--text-muted);
+      font-size: 13.5px;
+      line-height: 1.4;
+      transition: background 0.12s, color 0.12s;
+    }
+
+    .sidebar-nav a:hover { background: #ece9e4; color: var(--text); }
+
+    .sidebar-nav a.active {
+      background: var(--sidebar-active);
+      color: var(--sidebar-active-text);
+      font-weight: 500;
+    }
+
+    .sidebar-nav a.sub { padding-left: 24px; font-size: 13px; }
+
+    /* ── Main layout ──────────────────────────── */
+    .main-wrapper {
+      flex: 1;
+      display: flex;
+      overflow: hidden;
+    }
+
+    .content-area {
+      flex: 1;
+      max-width: 860px;
+      padding: 48px 56px 80px;
+      overflow-y: auto;
+      min-width: 0;
+    }
+
+    /* ── On-page TOC ──────────────────────────── */
+    .toc-col {
+      width: 224px;
+      min-width: 224px;
+      padding: 52px 0 32px 8px;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+    }
+
+    .toc-label {
+      font-size: 10.5px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      padding: 0 12px 10px;
+    }
+
+    .toc-nav { list-style: none; padding: 0 4px; }
+
+    .toc-nav li { margin: 1px 0; }
+
+    .toc-nav a {
+      display: block;
+      padding: 4px 12px;
+      border-radius: 5px;
+      text-decoration: none;
+      color: var(--text-muted);
+      font-size: 12.5px;
+      line-height: 1.45;
+      transition: background 0.1s, color 0.1s;
+    }
+
+    .toc-nav a:hover { background: #f0ede8; color: var(--text); }
+    .toc-nav a.sub { padding-left: 22px; font-size: 12px; }
+
+    /* ── Typography ───────────────────────────── */
+    .page-eyebrow {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--accent);
+      margin-bottom: 10px;
+    }
+
+    h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1.2;
+      color: var(--text);
+      margin-bottom: 14px;
+    }
+
+    .page-description {
+      font-size: 16.5px;
+      color: var(--text-muted);
+      line-height: 1.6;
+      margin-bottom: 32px;
+      max-width: 620px;
+    }
+
+    h2 {
+      font-size: 1.35rem;
+      font-weight: 650;
+      letter-spacing: -0.02em;
+      color: var(--text);
+      margin: 44px 0 12px;
+      padding-top: 4px;
+      border-top: 1px solid var(--border);
+      padding-top: 28px;
+    }
+
+    h3 {
+      font-size: 1.05rem;
+      font-weight: 650;
+      letter-spacing: -0.01em;
+      color: var(--text);
+      margin: 28px 0 8px;
+    }
+
+    h4 {
+      font-size: 0.9rem;
+      font-weight: 650;
+      color: var(--text);
+      margin: 20px 0 6px;
+    }
+
+    h5 {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin: 16px 0 6px;
+    }
+
+    p { margin-bottom: 14px; font-size: 15px; }
+
+    a { color: var(--link); text-decoration: none; }
+    a:hover { color: var(--link-hover); text-decoration: underline; }
+
+    strong { font-weight: 600; }
+
+    ul, ol { margin: 8px 0 14px 22px; font-size: 15px; }
+    li { margin-bottom: 5px; line-height: 1.6; }
+    li ul, li ol { margin-top: 4px; margin-bottom: 4px; }
+
+    /* ── Code ─────────────────────────────────── */
+    code {
+      font-family: var(--font-mono);
+      font-size: 0.83em;
+      background: var(--code-bg);
+      border: 1px solid var(--code-border);
+      border-radius: 4px;
+      padding: 1px 5px;
+      color: #c0392b;
+    }
+
+    pre {
+      background: #1e1e1e;
+      border-radius: 8px;
+      padding: 18px 20px;
+      overflow-x: auto;
+      margin: 16px 0;
+      position: relative;
+    }
+
+    pre code {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      background: none;
+      border: none;
+      padding: 0;
+      color: #d4d4d4;
+    }
+
+    /* JSON highlight tokens */
+    .tok-key   { color: #9cdcfe; }
+    .tok-str   { color: #ce9178; }
+    .tok-num   { color: #b5cea8; }
+    .tok-bool  { color: #569cd6; }
+    .tok-null  { color: #569cd6; }
+    .tok-punct { color: #d4d4d4; }
+    .tok-cmd   { color: #dcdcaa; }
+    .tok-flag  { color: #9cdcfe; }
+
+    /* ── Tables ───────────────────────────────── */
+    .table-wrap { overflow-x: auto; margin: 16px 0; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    thead th {
+      background: var(--table-header);
+      text-align: left;
+      padding: 9px 14px;
+      font-weight: 600;
+      font-size: 12.5px;
+      border-bottom: 2px solid var(--border);
+      white-space: nowrap;
+    }
+
+    tbody td {
+      padding: 9px 14px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+      line-height: 1.55;
+    }
+
+    tbody tr:last-child td { border-bottom: none; }
+    tbody tr:hover { background: #fafaf8; }
+
+    /* ── Callouts ─────────────────────────────── */
+    .callout {
+      display: flex;
+      gap: 12px;
+      border-radius: 8px;
+      padding: 14px 16px;
+      margin: 18px 0;
+      font-size: 14.5px;
+      line-height: 1.6;
+    }
+
+    .callout-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+
+    .callout.tip    { background: var(--tip-bg);  border-left: 3px solid var(--tip-border);  }
+    .callout.note   { background: var(--note-bg); border-left: 3px solid var(--note-border); }
+
+    .callout-title { font-weight: 600; margin-bottom: 3px; font-size: 13.5px; }
+
+    .callout p:last-child { margin-bottom: 0; }
+
+    /* ── Tabs ─────────────────────────────────── */
+    .tabs { margin: 18px 0; }
+
+    .tab-list {
+      display: flex;
+      gap: 0;
+      border-bottom: 2px solid var(--border);
+      margin-bottom: 0;
+    }
+
+    .tab-btn {
+      padding: 8px 16px;
+      font-size: 13.5px;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      background: none;
+      color: var(--text-muted);
+      border-bottom: 2px solid transparent;
+      margin-bottom: -2px;
+      transition: color 0.12s, border-color 0.12s;
+      font-family: var(--font-sans);
+    }
+
+    .tab-btn:hover { color: var(--text); }
+
+    .tab-btn.active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+      font-weight: 600;
+    }
+
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    .tab-panel pre { border-radius: 0 8px 8px 8px; }
+
+    /* ── Breadcrumb ───────────────────────────── */
+    .breadcrumb {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12.5px;
+      color: var(--text-muted);
+      margin-bottom: 28px;
+    }
+
+    .breadcrumb a { color: var(--text-muted); }
+    .breadcrumb a:hover { color: var(--text); text-decoration: none; }
+    .breadcrumb-sep { color: #ccc; }
+
+    /* ── Feature cards ────────────────────────── */
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 12px;
+      margin: 18px 0;
+    }
+
+    .feature-card {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px 16px;
+      font-size: 13.5px;
+      line-height: 1.5;
+    }
+
+    .feature-card-icon { font-size: 20px; margin-bottom: 6px; }
+    .feature-card-title { font-weight: 600; margin-bottom: 4px; }
+    .feature-card-desc { color: var(--text-muted); font-size: 13px; }
+
+    /* ── Divider ──────────────────────────────── */
+    hr { border: none; border-top: 1px solid var(--border); margin: 32px 0; }
+
+    /* ── Responsive ───────────────────────────── */
+    @media (max-width: 1100px) {
+      .toc-col { display: none; }
+    }
+
+    @media (max-width: 768px) {
+      .sidebar { display: none; }
+      .content-area { padding: 32px 24px 60px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── Sidebar ──────────────────────────────────────────── -->
+<nav class="sidebar" aria-label="Site navigation">
+  <a class="sidebar-logo" href="#">
+    <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
+      <rect width="32" height="32" rx="8" fill="#d97706"/>
+      <path d="M9 22L16 8l7 14M11.8 17h8.4" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <div>
+      <div class="sidebar-logo-text">Claude</div>
+      <div class="sidebar-logo-sub">Documentation</div>
+    </div>
+  </a>
+
+  <div class="sidebar-section-label">Getting Started</div>
+  <ul class="sidebar-nav">
+    <li><a href="#">Overview</a></li>
+    <li><a href="#">Quickstart</a></li>
+    <li><a href="#">Desktop quickstart</a></li>
+  </ul>
+
+  <div class="sidebar-section-label">Claude Code</div>
+  <ul class="sidebar-nav">
+    <li><a href="#">CLI reference</a></li>
+    <li><a href="#" class="active">Use Claude Code Desktop</a></li>
+    <li><a href="#" class="sub">Start a session</a></li>
+    <li><a href="#" class="sub">Work with code</a></li>
+    <li><a href="#" class="sub">Manage sessions</a></li>
+    <li><a href="#" class="sub">Schedule tasks</a></li>
+    <li><a href="#" class="sub">Enterprise config</a></li>
+    <li><a href="#" class="sub">Troubleshooting</a></li>
+    <li><a href="#">Claude Code on the web</a></li>
+    <li><a href="#">Permissions</a></li>
+    <li><a href="#">MCP servers</a></li>
+    <li><a href="#">Hooks</a></li>
+    <li><a href="#">Skills</a></li>
+    <li><a href="#">Plugins</a></li>
+    <li><a href="#">Settings</a></li>
+    <li><a href="#">Memory (CLAUDE.md)</a></li>
+  </ul>
+
+  <div class="sidebar-section-label">Reference</div>
+  <ul class="sidebar-nav">
+    <li><a href="#">Models</a></li>
+    <li><a href="#">Environment variables</a></li>
+    <li><a href="#">Network configuration</a></li>
+    <li><a href="#">Data usage</a></li>
+  </ul>
+</nav>
+
+<!-- ── Main content wrapper ────────────────────────────── -->
+<div class="main-wrapper">
+  <main class="content-area">
+
+    <div class="breadcrumb">
+      <a href="#">Claude Code</a>
+      <span class="breadcrumb-sep">›</span>
+      <span>Use Claude Code Desktop</span>
+    </div>
+
+    <div class="page-eyebrow">Claude Code</div>
+    <h1>Use Claude Code Desktop</h1>
+    <p class="page-description">Get more out of Claude Code Desktop: parallel sessions with Git isolation, visual diff review, app previews, PR monitoring, permission modes, connectors, and enterprise configuration.</p>
+
+    <p>The <strong>Code</strong> tab within the Claude Desktop app lets you use Claude Code through a graphical interface instead of the terminal.</p>
+    <p>Desktop adds these capabilities on top of the standard Claude Code experience:</p>
+
+    <div class="feature-grid">
+      <div class="feature-card">
+        <div class="feature-card-icon">🔍</div>
+        <div class="feature-card-title">Visual diff review</div>
+        <div class="feature-card-desc">Inline comments on file-by-file diffs before you commit.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-card-icon">🖥️</div>
+        <div class="feature-card-title">Live app preview</div>
+        <div class="feature-card-desc">Dev servers with auto-verify after every edit.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-card-icon">🔀</div>
+        <div class="feature-card-title">GitHub PR monitoring</div>
+        <div class="feature-card-desc">Auto-fix failing CI checks and auto-merge when ready.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-card-icon">⚡</div>
+        <div class="feature-card-title">Parallel sessions</div>
+        <div class="feature-card-desc">Automatic Git worktree isolation per session.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-card-icon">🕐</div>
+        <div class="feature-card-title">Scheduled tasks</div>
+        <div class="feature-card-desc">Run Claude on a recurring schedule automatically.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-card-icon">🔌</div>
+        <div class="feature-card-title">Connectors</div>
+        <div class="feature-card-desc">GitHub, Slack, Linear, Notion, Google Calendar, and more.</div>
+      </div>
+    </div>
+
+    <div class="callout tip">
+      <span class="callout-icon">💡</span>
+      <div>
+        <div class="callout-title">New to Desktop?</div>
+        <p>Start with <a href="#">Get started</a> to install the app and make your first edit.</p>
+      </div>
+    </div>
+
+    <!-- ── Start a session ───────────────────── -->
+    <h2 id="start-a-session">Start a session</h2>
+    <p>Before you send your first message, configure four things in the prompt area:</p>
+    <ul>
+      <li><strong>Environment</strong>: choose where Claude runs. Select <strong>Local</strong> for your machine, <strong>Remote</strong> for Anthropic-hosted cloud sessions, or an <a href="#ssh-sessions">SSH connection</a> for a remote machine you manage.</li>
+      <li><strong>Project folder</strong>: select the folder or repository Claude works in. For remote sessions, you can add <a href="#run-long-running-tasks-remotely">multiple repositories</a>.</li>
+      <li><strong>Model</strong>: pick a model from the dropdown next to the send button. The model is locked once the session starts.</li>
+      <li><strong>Permission mode</strong>: choose how much autonomy Claude has from the mode selector. You can change this during the session.</li>
+    </ul>
+    <p>Type your task and press <strong>Enter</strong> to start. Each session tracks its own context and changes independently.</p>
+
+    <!-- ── Work with code ────────────────────── -->
+    <h2 id="work-with-code">Work with code</h2>
+    <p>Give Claude the right context, control how much it does on its own, and review what it changed.</p>
+
+    <h3 id="use-the-prompt-box">Use the prompt box</h3>
+    <p>Type what you want Claude to do and press <strong>Enter</strong> to send. Claude reads your project files, makes changes, and runs commands based on your permission mode. You can interrupt Claude at any point: click the stop button or type your correction and press <strong>Enter</strong>.</p>
+    <p>The <strong>+</strong> button next to the prompt box gives you access to file attachments, skills, connectors, and plugins.</p>
+
+    <h3 id="add-files-and-context">Add files and context to prompts</h3>
+    <ul>
+      <li><strong>@mention files</strong>: type <code>@</code> followed by a filename to add a file to the conversation context.</li>
+      <li><strong>Attach files</strong>: attach images, PDFs, and other files using the attachment button, or drag and drop directly into the prompt.</li>
+    </ul>
+
+    <h3 id="choose-a-permission-mode">Choose a permission mode</h3>
+    <p>Permission modes control how much autonomy Claude has during a session. You can switch modes at any time using the mode selector next to the send button.</p>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Mode</th>
+            <th>Settings key</th>
+            <th>Behavior</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Ask permissions</strong></td>
+            <td><code>default</code></td>
+            <td>Claude asks before editing files or running commands. You see a diff and can accept or reject each change. Recommended for new users.</td>
+          </tr>
+          <tr>
+            <td><strong>Auto accept edits</strong></td>
+            <td><code>acceptEdits</code></td>
+            <td>Claude auto-accepts file edits but still asks before running terminal commands. Use when you trust file changes and want faster iteration.</td>
+          </tr>
+          <tr>
+            <td><strong>Plan mode</strong></td>
+            <td><code>plan</code></td>
+            <td>Claude analyzes your code and creates a plan without modifying files or running commands. Good for complex tasks where you want to review the approach first.</td>
+          </tr>
+          <tr>
+            <td><strong>Bypass permissions</strong></td>
+            <td><code>bypassPermissions</code></td>
+            <td>Claude runs without any permission prompts. Enable in Settings → Claude Code. Only use in sandboxed containers or VMs.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout tip">
+      <span class="callout-icon">💡</span>
+      <div>
+        <div class="callout-title">Best practice</div>
+        <p>Start complex tasks in <strong>Plan mode</strong> so Claude maps out an approach before making changes. Once you approve the plan, switch to Auto accept edits or Ask permissions to execute it.</p>
+      </div>
+    </div>
+
+    <h3 id="preview-your-app">Preview your app</h3>
+    <p>Claude can start a dev server and open an embedded browser to verify its changes. This works for frontend web apps as well as backend servers. In most cases, Claude starts the server automatically after editing project files.</p>
+    <p>From the preview panel, you can:</p>
+    <ul>
+      <li>Interact with your running app directly in the embedded browser</li>
+      <li>Watch Claude verify its own changes automatically: it takes screenshots, inspects the DOM, clicks elements, fills forms, and fixes issues it finds</li>
+      <li>Start or stop servers from the <strong>Preview</strong> dropdown in the session toolbar</li>
+      <li>Persist cookies and local storage across server restarts by selecting <strong>Persist sessions</strong></li>
+    </ul>
+
+    <h3 id="review-changes-with-diff-view">Review changes with diff view</h3>
+    <p>After Claude makes changes, a diff stats indicator appears showing lines added and removed, such as <code>+12 -1</code>. Click this indicator to open the diff viewer.</p>
+    <p>To comment on specific lines, click any line in the diff to open a comment box. Submit all comments at once:</p>
+    <ul>
+      <li><strong>macOS</strong>: press <kbd>Cmd+Enter</kbd></li>
+      <li><strong>Windows</strong>: press <kbd>Ctrl+Enter</kbd></li>
+    </ul>
+
+    <h3 id="review-your-code">Review your code</h3>
+    <p>In the diff view, click <strong>Review code</strong> in the top-right toolbar to ask Claude to evaluate changes before you commit. The review focuses on high-signal issues: compile errors, definite logic errors, security vulnerabilities, and obvious bugs. It does not flag style, formatting, or pre-existing issues.</p>
+
+    <h3 id="monitor-pull-request-status">Monitor pull request status</h3>
+    <p>After you open a pull request, a CI status bar appears in the session. Claude Code uses the GitHub CLI to poll check results and surface failures.</p>
+    <ul>
+      <li><strong>Auto-fix</strong>: when enabled, Claude automatically attempts to fix failing CI checks.</li>
+      <li><strong>Auto-merge</strong>: when enabled, Claude merges the PR once all checks pass (squash merge).</li>
+    </ul>
+    <div class="callout note">
+      <span class="callout-icon">📝</span>
+      <div>
+        <p>PR monitoring requires the <a href="https://cli.github.com/">GitHub CLI (<code>gh</code>)</a> to be installed and authenticated on your machine.</p>
+      </div>
+    </div>
+
+    <!-- ── Manage sessions ───────────────────── -->
+    <h2 id="manage-sessions">Manage sessions</h2>
+    <p>Each session is an independent conversation with its own context and changes. You can run multiple sessions in parallel or send work to the cloud.</p>
+
+    <h3 id="work-in-parallel-with-sessions">Work in parallel with sessions</h3>
+    <p>Click <strong>+ New session</strong> in the sidebar to work on multiple tasks in parallel. For Git repositories, each session gets its own isolated copy of your project using <a href="#">Git worktrees</a>, so changes in one session don't affect other sessions until you commit them.</p>
+    <p>Worktrees are stored in <code>&lt;project-root&gt;/.claude/worktrees/</code> by default. You can change this in Settings → Claude Code under "Worktree location".</p>
+
+    <div class="callout note">
+      <span class="callout-icon">📝</span>
+      <div>
+        <p>Session isolation requires <a href="https://git-scm.com/downloads">Git</a>. On Windows, Git is required for the Code tab to work: <a href="https://git-scm.com/downloads/win">download Git for Windows</a>, install it, and restart the app.</p>
+      </div>
+    </div>
+
+    <h3 id="run-long-running-tasks-remotely">Run long-running tasks remotely</h3>
+    <p>For large refactors, test suites, migrations, or other long-running tasks, select <strong>Remote</strong> when starting a session. Remote sessions run on Anthropic's cloud infrastructure and continue even if you close the app or shut down your computer.</p>
+    <p>Remote sessions also support multiple repositories. After selecting a cloud environment, click the <strong>+</strong> button next to the repo pill to add additional repositories to the session.</p>
+
+    <h3 id="continue-in-another-surface">Continue in another surface</h3>
+    <p>The <strong>Continue in</strong> menu lets you move your session to another surface:</p>
+    <ul>
+      <li><strong>Claude Code on the Web</strong>: sends your local session to continue running remotely. Desktop pushes your branch, generates a summary, and creates a new remote session with the full context.</li>
+      <li><strong>Your IDE</strong>: opens your project in a supported IDE at the current working directory.</li>
+    </ul>
+
+    <!-- ── Extend Claude Code ─────────────────── -->
+    <h2 id="extend-claude-code">Extend Claude Code</h2>
+    <p>Connect external services, add reusable workflows, customize Claude's behavior, and configure preview servers.</p>
+
+    <h3 id="connect-external-tools">Connect external tools</h3>
+    <p>Click the <strong>+</strong> button next to the prompt box and select <strong>Connectors</strong> to add integrations like Google Calendar, Slack, GitHub, Linear, Notion, and more. Connectors are <a href="#">MCP servers</a> with a graphical setup flow.</p>
+
+    <h3 id="use-skills">Use skills</h3>
+    <p><a href="#">Skills</a> extend what Claude can do. Claude loads them automatically when relevant, or you can invoke one directly: type <code>/</code> in the prompt box or click <strong>+</strong> and select <strong>Slash commands</strong> to browse what's available.</p>
+
+    <h3 id="install-plugins">Install plugins</h3>
+    <p><a href="#">Plugins</a> are reusable packages that add skills, agents, hooks, MCP servers, and LSP configurations to Claude Code. Install them from the desktop app without using the terminal.</p>
+
+    <h3 id="configure-preview-servers">Configure preview servers</h3>
+    <p>Claude automatically detects your dev server setup and stores the configuration in <code>.claude/launch.json</code>. To customize how your server starts, edit the file manually or click <strong>Edit configuration</strong> in the Preview dropdown.</p>
+
+    <pre><code><span class="tok-punct">{</span>
+  <span class="tok-key">"version"</span><span class="tok-punct">:</span> <span class="tok-str">"0.0.1"</span><span class="tok-punct">,</span>
+  <span class="tok-key">"configurations"</span><span class="tok-punct">:</span> <span class="tok-punct">[</span>
+    <span class="tok-punct">{</span>
+      <span class="tok-key">"name"</span><span class="tok-punct">:</span> <span class="tok-str">"my-app"</span><span class="tok-punct">,</span>
+      <span class="tok-key">"runtimeExecutable"</span><span class="tok-punct">:</span> <span class="tok-str">"npm"</span><span class="tok-punct">,</span>
+      <span class="tok-key">"runtimeArgs"</span><span class="tok-punct">:</span> <span class="tok-punct">[</span><span class="tok-str">"run"</span><span class="tok-punct">,</span> <span class="tok-str">"dev"</span><span class="tok-punct">],</span>
+      <span class="tok-key">"port"</span><span class="tok-punct">:</span> <span class="tok-num">3000</span>
+    <span class="tok-punct">}</span>
+  <span class="tok-punct">]</span>
+<span class="tok-punct">}</span></code></pre>
+
+    <h4 id="auto-verify-changes">Auto-verify changes</h4>
+    <p>When <code>autoVerify</code> is enabled (the default), Claude automatically verifies code changes after editing files: takes screenshots, checks for errors, and confirms changes work. Disable per-project:</p>
+
+    <pre><code><span class="tok-punct">{</span>
+  <span class="tok-key">"version"</span><span class="tok-punct">:</span> <span class="tok-str">"0.0.1"</span><span class="tok-punct">,</span>
+  <span class="tok-key">"autoVerify"</span><span class="tok-punct">:</span> <span class="tok-bool">false</span><span class="tok-punct">,</span>
+  <span class="tok-key">"configurations"</span><span class="tok-punct">:</span> <span class="tok-punct">[...]</span>
+<span class="tok-punct">}</span></code></pre>
+
+    <h4 id="configuration-fields">Configuration fields</h4>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Field</th><th>Type</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>name</code></td><td>string</td><td>A unique identifier for this server</td></tr>
+          <tr><td><code>runtimeExecutable</code></td><td>string</td><td>The command to run, such as <code>npm</code>, <code>yarn</code>, or <code>node</code></td></tr>
+          <tr><td><code>runtimeArgs</code></td><td>string[]</td><td>Arguments passed to <code>runtimeExecutable</code>, such as <code>["run", "dev"]</code></td></tr>
+          <tr><td><code>port</code></td><td>number</td><td>The port your server listens on. Defaults to 3000</td></tr>
+          <tr><td><code>cwd</code></td><td>string</td><td>Working directory relative to your project root. Use <code>${workspaceFolder}</code> to reference the project root explicitly</td></tr>
+          <tr><td><code>env</code></td><td>object</td><td>Additional environment variables as key-value pairs. Don't put secrets here.</td></tr>
+          <tr><td><code>autoPort</code></td><td>boolean</td><td>How to handle port conflicts</td></tr>
+          <tr><td><code>program</code></td><td>string</td><td>A script to run with <code>node</code></td></tr>
+          <tr><td><code>args</code></td><td>string[]</td><td>Arguments passed to <code>program</code>. Only used when <code>program</code> is set</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h5>Port conflicts</h5>
+    <p>The <code>autoPort</code> field controls what happens when your preferred port is already in use:</p>
+    <ul>
+      <li><strong><code>true</code></strong>: Claude finds and uses a free port automatically.</li>
+      <li><strong><code>false</code></strong>: Claude fails with an error. Use when your server must use a specific port.</li>
+      <li><strong>Not set (default)</strong>: Claude asks whether the server needs that exact port, then saves your answer.</li>
+    </ul>
+
+    <h4 id="examples">Examples</h4>
+
+    <div class="tabs" id="launch-tabs">
+      <div class="tab-list" role="tablist">
+        <button class="tab-btn active" role="tab" onclick="switchTab(this, 'tab-nextjs')">Next.js</button>
+        <button class="tab-btn" role="tab" onclick="switchTab(this, 'tab-multi')">Multiple servers</button>
+        <button class="tab-btn" role="tab" onclick="switchTab(this, 'tab-node')">Node.js script</button>
+      </div>
+
+      <div id="tab-nextjs" class="tab-panel active">
+        <p style="margin:12px 0 4px;font-size:14px;color:var(--text-muted)">This configuration runs a Next.js app using Yarn on port 3000:</p>
+        <pre><code><span class="tok-punct">{</span>
+  <span class="tok-key">"version"</span><span class="tok-punct">:</span> <span class="tok-str">"0.0.1"</span><span class="tok-punct">,</span>
+  <span class="tok-key">"configurations"</span><span class="tok-punct">:</span> <span class="tok-punct">[</span>
+    <span class="tok-punct">{</span>
+      <span class="tok-key">"name"</span><span class="tok-punct">:</span> <span class="tok-str">"web"</span><span class="tok-punct">,</span>
+      <span class="tok-key">"runtimeExecutable"</span><span class="tok-punct">:</span> <span class="tok-str">"yarn"</span><span class="tok-punct">,</span>
+      <span class="tok-key">"runtimeArgs"</span><span class="tok-punct">:</span> <span class="tok-punct">[</span><span class="tok-str">"dev"</span><span class="tok-punct">],</span>
+      <span class="tok-key">"port"</span><span class="tok-punct">:</span> <span class="tok-num">3000</span>
+    <span class="tok-punct">}</span>
+  <span class="tok-punct">]</span>
+<span class="tok-punct">}</span></code></pre>
+      </div>
+
+      <div id="tab-multi" class="tab-panel">
+        <p style="margin:12px 0 4px;font-size:14px;color:var(--text-muted)">For a monorepo with a frontend and an API server, define multiple configurations:</p>
+        <pre><code><span class="tok-punct">{</span>
+  <span class="tok-key">"version"</span><span class="tok-punct">:</span> <span class="tok-str">"0.0.1"</span><span class="tok-punct">,</span>
+  <span class="tok-key">"configurations"</span><span class="tok-punct">:</span> <span class="tok-punct">[</span>
+    <span class="tok-punct">{</span>
+      <span class="tok-key">"name"</span><span class="tok-punct">:</span> <span class="tok-str">"frontend"</span><span class="tok-punct">,</span>
+      <span class="tok-key">"runtimeExecutable"</span><span class="tok-punct">:</span> <span class="tok-str">"npm"</span><span class="tok-punct">,</span>
+      <span class="tok-key">"runtimeArgs"</span><span class="tok-punct">:</span> <span class="tok-punct">[</span><span class="tok-str">"run"</span><span class="tok-punct">,</span> <span class="tok-str">"dev"</span><span class="tok-punct">],</span>
+      <span class="tok-key">"cwd"</span><span class="tok-punct">:</span> <span class="tok-str">"apps/web"</span><span class="tok-punct">,</span>
+      <span class="tok-key">"port"</span><span class="tok-punct">:</span> <span class="tok-num">3000</span><span class="tok-punct">,</span>
+      <span class="tok-key">"autoPort"</span><span class="tok-punct">:</span> <span class="tok-bool">true</span>
+    <span class="tok-punct">}</span><span class="tok-punct">,</span>
+    <span class="tok-punct">{</span>
+      <span class="tok-key">"name"</span><span class="tok-punct">:</span> <span class="tok-str">"api"</span><span class="tok-punct">,</span>
+      <span class="tok-key">"runtimeExecutable"</span><span class="tok-punct">:</span> <span class="tok-str">"npm"</span><span class="tok-punct">,</span>
+      <span class="tok-key">"runtimeArgs"</span><span class="tok-punct">:</span> <span class="tok-punct">[</span><span class="tok-str">"run"</span><span class="tok-punct">,</span> <span class="tok-str">"start"</span><span class="tok-punct">],</span>
+      <span class="tok-key">"cwd"</span><span class="tok-punct">:</span> <span class="tok-str">"server"</span><span class="tok-punct">,</span>
+      <span class="tok-key">"port"</span><span class="tok-punct">:</span> <span class="tok-num">8080</span><span class="tok-punct">,</span>
+      <span class="tok-key">"env"</span><span class="tok-punct">:</span> <span class="tok-punct">{</span> <span class="tok-key">"NODE_ENV"</span><span class="tok-punct">:</span> <span class="tok-str">"development"</span> <span class="tok-punct">}</span><span class="tok-punct">,</span>
+      <span class="tok-key">"autoPort"</span><span class="tok-punct">:</span> <span class="tok-bool">false</span>
+    <span class="tok-punct">}</span>
+  <span class="tok-punct">]</span>
+<span class="tok-punct">}</span></code></pre>
+      </div>
+
+      <div id="tab-node" class="tab-panel">
+        <p style="margin:12px 0 4px;font-size:14px;color:var(--text-muted)">To run a Node.js script directly, use the <code>program</code> field:</p>
+        <pre><code><span class="tok-punct">{</span>
+  <span class="tok-key">"version"</span><span class="tok-punct">:</span> <span class="tok-str">"0.0.1"</span><span class="tok-punct">,</span>
+  <span class="tok-key">"configurations"</span><span class="tok-punct">:</span> <span class="tok-punct">[</span>
+    <span class="tok-punct">{</span>
+      <span class="tok-key">"name"</span><span class="tok-punct">:</span> <span class="tok-str">"server"</span><span class="tok-punct">,</span>
+      <span class="tok-key">"program"</span><span class="tok-punct">:</span> <span class="tok-str">"server.js"</span><span class="tok-punct">,</span>
+      <span class="tok-key">"args"</span><span class="tok-punct">:</span> <span class="tok-punct">[</span><span class="tok-str">"--verbose"</span><span class="tok-punct">],</span>
+      <span class="tok-key">"port"</span><span class="tok-punct">:</span> <span class="tok-num">4000</span>
+    <span class="tok-punct">}</span>
+  <span class="tok-punct">]</span>
+<span class="tok-punct">}</span></code></pre>
+      </div>
+    </div>
+
+    <!-- ── Schedule recurring tasks ──────────── -->
+    <h2 id="schedule-recurring-tasks">Schedule recurring tasks</h2>
+    <p>Scheduled tasks start a new local session automatically at a time and frequency you choose. Use them for recurring work like daily code reviews, dependency update checks, or morning briefings.</p>
+
+    <div class="callout note">
+      <span class="callout-icon">📝</span>
+      <div>
+        <p>By default, scheduled tasks run against whatever state your working directory is in, including uncommitted changes. Enable the worktree toggle in the prompt input to give each run its own isolated Git worktree.</p>
+      </div>
+    </div>
+
+    <p>To create a scheduled task, click <strong>Schedule</strong> in the sidebar, then <strong>+ New task</strong>. Configure these fields:</p>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Field</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Name</strong></td><td>Identifier for the task. Converted to lowercase kebab-case and used as the folder name on disk. Must be unique.</td></tr>
+          <tr><td><strong>Description</strong></td><td>Short summary shown in the task list.</td></tr>
+          <tr><td><strong>Prompt</strong></td><td>The instructions sent to Claude when the task runs. Write this the same way you'd write any message in the prompt box.</td></tr>
+          <tr><td><strong>Frequency</strong></td><td>How often the task runs. See frequency options below.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 id="frequency-options">Frequency options</h3>
+    <ul>
+      <li><strong>Manual</strong>: no schedule, only runs when you click <strong>Run now</strong>.</li>
+      <li><strong>Hourly</strong>: runs every hour. Each task gets a fixed offset of up to 10 minutes.</li>
+      <li><strong>Daily</strong>: shows a time picker, defaults to 9:00 AM local time.</li>
+      <li><strong>Weekdays</strong>: same as Daily but skips Saturday and Sunday.</li>
+      <li><strong>Weekly</strong>: shows a time picker and a day picker.</li>
+    </ul>
+
+    <h3 id="how-scheduled-tasks-run">How scheduled tasks run</h3>
+    <p>Scheduled tasks run locally on your machine. Desktop checks the schedule every minute while the app is open and starts a fresh session when a task is due. Tasks only run while the desktop app is running and your computer is awake.</p>
+
+    <h3 id="missed-runs">Missed runs</h3>
+    <p>When the app starts or your computer wakes, Desktop checks whether each task missed any runs in the last seven days. If it did, Desktop starts exactly one catch-up run for the most recently missed time and discards anything older.</p>
+
+    <h3 id="permissions-for-scheduled-tasks">Permissions for scheduled tasks</h3>
+    <p>Each task has its own permission mode. If a task runs in Ask mode and needs to run a tool it doesn't have permission for, the run stalls until you approve it. To avoid stalls, click <strong>Run now</strong> after creating a task and select "always allow" for each permission prompt.</p>
+
+    <h3 id="manage-scheduled-tasks">Manage scheduled tasks</h3>
+    <p>Click a task in the <strong>Schedule</strong> list to open its detail page. From here you can run now, toggle repeats, edit, review history, manage allowed permissions, or delete the task.</p>
+
+    <!-- ── Environment configuration ─────────── -->
+    <h2 id="environment-configuration">Environment configuration</h2>
+    <p>The environment you pick when starting a session determines where Claude executes:</p>
+    <ul>
+      <li><strong>Local</strong>: runs on your machine with direct access to your files</li>
+      <li><strong>Remote</strong>: runs on Anthropic's cloud infrastructure. Sessions continue even if you close the app.</li>
+      <li><strong>SSH</strong>: runs on a remote machine you connect to over SSH</li>
+    </ul>
+
+    <h3 id="local-sessions">Local sessions</h3>
+    <p>Local sessions inherit environment variables from your shell. If you need additional variables, set them in your shell profile (<code>~/.zshrc</code> or <code>~/.bashrc</code>) and restart the desktop app.</p>
+
+    <h3 id="remote-sessions">Remote sessions</h3>
+    <p>Remote sessions continue in the background even if you close the app. Usage counts toward your subscription plan limits with no separate compute charges. You can create custom cloud environments with different network access levels.</p>
+
+    <h3 id="ssh-sessions">SSH sessions</h3>
+    <p>SSH sessions let you run Claude Code on a remote machine while using the desktop app as your interface. To add an SSH connection, click the environment dropdown and select <strong>+ Add SSH connection</strong>. The dialog asks for:</p>
+    <ul>
+      <li><strong>Name</strong>: a friendly label for this connection</li>
+      <li><strong>SSH Host</strong>: <code>user@hostname</code> or a host defined in <code>~/.ssh/config</code></li>
+      <li><strong>SSH Port</strong>: defaults to 22 if left empty</li>
+      <li><strong>Identity File</strong>: path to your private key, such as <code>~/.ssh/id_rsa</code></li>
+    </ul>
+
+    <!-- ── Enterprise configuration ──────────── -->
+    <h2 id="enterprise-configuration">Enterprise configuration</h2>
+    <p>Organizations on Teams or Enterprise plans can manage desktop app behavior through admin console controls, managed settings files, and device management policies.</p>
+
+    <h3>Admin console controls</h3>
+    <ul>
+      <li><strong>Enable or disable the Code tab</strong>: control whether users can access Claude Code in the desktop app</li>
+      <li><strong>Disable Bypass permissions mode</strong>: prevent users from enabling bypass permissions mode</li>
+      <li><strong>Disable Claude Code on the web</strong>: enable or disable remote sessions</li>
+    </ul>
+
+    <h3>Managed settings</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Key</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><code>disableBypassPermissionsMode</code></td>
+            <td>Set to <code>"disable"</code> to prevent users from enabling Bypass permissions mode.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Device management policies</h3>
+    <ul>
+      <li><strong>macOS</strong>: configure via <code>com.anthropic.Claude</code> preference domain using Jamf or Kandji</li>
+      <li><strong>Windows</strong>: configure via registry at <code>SOFTWARE\Policies\Claude</code></li>
+    </ul>
+
+    <!-- ── Coming from the CLI ────────────────── -->
+    <h2 id="coming-from-the-cli">Coming from the CLI?</h2>
+    <p>If you already use the Claude Code CLI, Desktop runs the same underlying engine with a graphical interface. You can run both simultaneously on the same machine. Each maintains separate session history, but they share configuration and project memory via CLAUDE.md files.</p>
+    <p>To move a CLI session into Desktop, run <code>/desktop</code> in the terminal. Claude saves your session and opens it in the desktop app, then exits the CLI.</p>
+
+    <div class="callout tip">
+      <span class="callout-icon">💡</span>
+      <div>
+        <p><strong>When to use Desktop vs CLI:</strong> use Desktop when you want visual diff review, file attachments, or session management in a sidebar. Use the CLI when you need scripting, automation, third-party providers, or prefer a terminal workflow.</p>
+      </div>
+    </div>
+
+    <h3>CLI flag equivalents</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>CLI</th><th>Desktop equivalent</th></tr></thead>
+        <tbody>
+          <tr><td><code>--model sonnet</code></td><td>Model dropdown next to the send button, before starting a session</td></tr>
+          <tr><td><code>--resume</code>, <code>--continue</code></td><td>Click a session in the sidebar</td></tr>
+          <tr><td><code>--permission-mode</code></td><td>Mode selector next to the send button</td></tr>
+          <tr><td><code>--dangerously-skip-permissions</code></td><td>Bypass permissions mode in Settings → Claude Code</td></tr>
+          <tr><td><code>--add-dir</code></td><td>Add multiple repos with the <strong>+</strong> button in remote sessions</td></tr>
+          <tr><td><code>--allowedTools</code>, <code>--disallowedTools</code></td><td>Not available in Desktop</td></tr>
+          <tr><td><code>--verbose</code></td><td>Not available. Check system logs via Console.app (macOS) or Event Viewer (Windows)</td></tr>
+          <tr><td><code>--print</code>, <code>--output-format</code></td><td>Not available. Desktop is interactive only.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Feature comparison</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Feature</th><th>CLI</th><th>Desktop</th></tr></thead>
+        <tbody>
+          <tr><td>Permission modes</td><td>All modes including <code>dontAsk</code></td><td>Ask, Auto accept edits, Plan mode, Bypass permissions via Settings</td></tr>
+          <tr><td>Third-party providers</td><td>Bedrock, Vertex, Foundry</td><td>Not available. Connects to Anthropic's API directly.</td></tr>
+          <tr><td>MCP servers</td><td>Settings files</td><td>Connectors UI for local and SSH sessions, or settings files</td></tr>
+          <tr><td>Plugins</td><td><code>/plugin</code> command</td><td>Plugin manager UI</td></tr>
+          <tr><td>File attachments</td><td>Not available</td><td>Images, PDFs</td></tr>
+          <tr><td>Session isolation</td><td><code>--worktree</code> flag</td><td>Automatic worktrees</td></tr>
+          <tr><td>Multiple sessions</td><td>Separate terminals</td><td>Sidebar tabs</td></tr>
+          <tr><td>Recurring tasks</td><td>Cron jobs, CI pipelines</td><td>Scheduled tasks</td></tr>
+          <tr><td>Scripting and automation</td><td><code>--print</code>, Agent SDK</td><td>Not available</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- ── Troubleshooting ────────────────────── -->
+    <h2 id="troubleshooting">Troubleshooting</h2>
+
+    <h3>Check your version</h3>
+    <ul>
+      <li><strong>macOS</strong>: click <strong>Claude</strong> in the menu bar, then <strong>About Claude</strong></li>
+      <li><strong>Windows</strong>: click <strong>Help</strong>, then <strong>About</strong></li>
+    </ul>
+
+    <h3>403 or authentication errors in the Code tab</h3>
+    <ol>
+      <li>Sign out and back in from the app menu. This is the most common fix.</li>
+      <li>Verify you have an active paid subscription: Pro, Max, Teams, or Enterprise.</li>
+      <li>If the CLI works but Desktop does not, quit the desktop app completely, then reopen and sign in again.</li>
+      <li>Check your internet connection and proxy settings.</li>
+    </ol>
+
+    <h3>Blank or stuck screen on launch</h3>
+    <ol>
+      <li>Restart the app.</li>
+      <li>Check for pending updates. The app auto-updates on launch.</li>
+      <li>On Windows, check Event Viewer for crash logs under <strong>Windows Logs → Application</strong>.</li>
+    </ol>
+
+    <h3>"Failed to load session"</h3>
+    <p>The selected folder may no longer exist, a Git repository may require Git LFS that isn't installed, or file permissions may prevent access. Try selecting a different folder or restarting the app.</p>
+
+    <h3>Session not finding installed tools</h3>
+    <p>If Claude can't find tools like <code>npm</code>, <code>node</code>, or other CLI commands: verify the tools work in your regular terminal, check that your shell profile properly sets up PATH, and restart the desktop app.</p>
+
+    <h3>Git and Git LFS errors</h3>
+    <p>On Windows, Git is required for the Code tab. If you see "Git is required," install <a href="https://git-scm.com/downloads/win">Git for Windows</a> and restart the app. For Git LFS, install from <a href="https://git-lfs.com/">git-lfs.com</a>, run <code>git lfs install</code>, and restart.</p>
+
+    <h3>App won't quit</h3>
+    <ul>
+      <li><strong>macOS</strong>: press <kbd>Cmd+Q</kbd>. If unresponsive, use <kbd>Cmd+Option+Esc</kbd>, select Claude, and click Force Quit.</li>
+      <li><strong>Windows</strong>: use Task Manager with <kbd>Ctrl+Shift+Esc</kbd> to end the Claude process.</li>
+    </ul>
+
+    <h3>"Branch doesn't exist yet" when opening in CLI</h3>
+    <p>Remote sessions can create branches that don't exist on your local machine. Click the branch name in the session toolbar to copy it, then fetch it locally:</p>
+    <pre><code><span class="tok-cmd">git fetch</span> origin <span class="tok-flag">&lt;branch-name&gt;</span>
+<span class="tok-cmd">git checkout</span> <span class="tok-flag">&lt;branch-name&gt;</span></code></pre>
+
+    <h3>Still stuck?</h3>
+    <ul>
+      <li>Search or file a bug on <a href="https://github.com/anthropics/claude-code/issues">GitHub Issues</a></li>
+      <li>Visit the <a href="https://support.claude.com/">Claude support center</a></li>
+    </ul>
+
+  </main>
+
+  <!-- ── On-page TOC ──────────────────────── -->
+  <aside class="toc-col" aria-label="On this page">
+    <div class="toc-label">On this page</div>
+    <ul class="toc-nav">
+      <li><a href="#start-a-session">Start a session</a></li>
+      <li><a href="#work-with-code">Work with code</a></li>
+      <li><a href="#use-the-prompt-box" class="sub">Use the prompt box</a></li>
+      <li><a href="#add-files-and-context" class="sub">Add files and context</a></li>
+      <li><a href="#choose-a-permission-mode" class="sub">Permission modes</a></li>
+      <li><a href="#preview-your-app" class="sub">Preview your app</a></li>
+      <li><a href="#review-changes-with-diff-view" class="sub">Diff view</a></li>
+      <li><a href="#review-your-code" class="sub">Review code</a></li>
+      <li><a href="#monitor-pull-request-status" class="sub">PR monitoring</a></li>
+      <li><a href="#manage-sessions">Manage sessions</a></li>
+      <li><a href="#work-in-parallel-with-sessions" class="sub">Parallel sessions</a></li>
+      <li><a href="#run-long-running-tasks-remotely" class="sub">Remote sessions</a></li>
+      <li><a href="#extend-claude-code">Extend Claude Code</a></li>
+      <li><a href="#configure-preview-servers" class="sub">Preview servers</a></li>
+      <li><a href="#schedule-recurring-tasks">Schedule recurring tasks</a></li>
+      <li><a href="#environment-configuration">Environment configuration</a></li>
+      <li><a href="#ssh-sessions" class="sub">SSH sessions</a></li>
+      <li><a href="#enterprise-configuration">Enterprise configuration</a></li>
+      <li><a href="#coming-from-the-cli">Coming from the CLI?</a></li>
+      <li><a href="#troubleshooting">Troubleshooting</a></li>
+    </ul>
+  </aside>
+</div>
+
+<script>
+  function switchTab(btn, panelId) {
+    const tabs = btn.closest('.tabs');
+    tabs.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    tabs.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(panelId).classList.add('active');
+  }
+
+  // Highlight active TOC item on scroll
+  const headings = document.querySelectorAll('h2[id], h3[id]');
+  const tocLinks = document.querySelectorAll('.toc-nav a');
+
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(a => a.classList.remove('active'));
+        const active = document.querySelector(`.toc-nav a[href="#${entry.target.id}"]`);
+        if (active) active.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-10% 0px -80% 0px' });
+
+  headings.forEach(h => observer.observe(h));
+</script>
+</body>
+</html>
